@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style></style>
+</head>
+<body>
+  <h1>Kerni Configuration</h1>
+
+  <div>
+    <h2>User keys</h2>
+    <p>You need to use your credentials key here so you have modify your projects</p>
+    <form>
+      <input type="text" placeholder="User key" name="kerni-editor-user-key">
+      <button id="save-changes-button" type="button">Save changes</button>
+    </form>
+  </div>
+
+  <div>
+    <h2>Projects</h2>
+    <p>Here you can find the projects associated with the user key</p>
+    <ul id="user-projects-list"></ul>
+    <strong id="user-projects-status-message"></strong>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<div id="kerni-editor" class="kerni-editor-flex-row kerni-editor-flex-sb" dir="ltr">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    #kerni-editor {
+      background-color: #252525;
+      height: 54px;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000000000;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 7px 15px;
+    }
+
+    #kerni-editor .kerni-editor-title {
+      margin-right: 48px;
+    }
+    
+    #kerni-editor h1 {
+      color: #ffffff;
+      font-weight: 400;
+      font-size: 25px;
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    #kerni-editor .kerni-editor-flex-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    #kerni-editor .kerni-editor-flex-end {
+      justify-content: flex-end;
+    }
+
+    #kerni-editor .kerni-editor-flex-sb {
+      justify-content: space-between;
+    }
+
+    #kerni-editor .kerni-editor-button {
+      color: #ffffff;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 400;
+      border-radius: 40px;
+      min-width: 80px;
+      background-color: #424242;
+      border: none;
+      margin-right: 8px;
+    }
+
+    #kerni-editor .kerni-editor-last {
+      margin-right: 0;
+      margin-left: 0;
+    }
+
+    #kerni-editor .kerni-editor-button:hover,
+    #kerni-editor .kerni-editor-button.kerni-editor-selected {
+      cursor: pointer;
+      color: #252525;
+      background-color: #FDFF8F;
+    }
+
+    #kerni-editor #kerni-editor-publish-changes {
+      font-size: 13px;
+      color: #9F9F9F;
+      margin-right: 13px;
+      font-family: sans-serif;
+    }
+
+    #kerni-editor .kerni-editor-dropdown {
+      border: 1px solid #424242;
+      background-color: #252525;
+    }
+
+    #kerni-editor-change-language-container {
+      position: relative;
+    }
+
+    #kerni-editor-language-dropdown {
+      position: absolute;
+      left: -20%;
+      bottom: 60px;
+      border-radius: 5px;
+      background-color: #252525;
+      color: #ffffff;
+    }
+
+    #kerni-editor-add-language-container {
+      position: absolute;
+      z-index: 1000000000000;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 100vh;
+      width: 100vw;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    #kerni-editor-add-language-content {
+      margin: 50px auto;
+      padding: 25px;
+      background: #252525;
+      color: #ffffff;
+      width: 300px;
+      align-items: center;
+      border-radius: 5px;
+    }
+
+    #kerni-editor-add-language-content h1 {
+      margin: 0;
+    }
+
+    #kerni-editor-language-dropdown ul,
+    #kerni-editor-add-language-content ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      border-bottom: 1px solid #9F9F9F;
+      max-height: 300px;
+      overflow: hidden;
+      overflow-y: scroll;
+    }
+
+    #kerni-editor-language-dropdown li,
+    #kerni-editor-add-language-content li {
+      cursor: pointer;
+      padding: 10px;
+      min-width: 250px;
+      font-size: 13px;
+      border-radius: 5px;
+      font-family: sans-serif;
+    }
+
+    #kerni-editor-language-dropdown li:hover,
+    #kerni-editor-add-language-content li:hover,
+    #kerni-editor-add-language-content .big-button:hover,
+    #kerni-editor-language-dropdown button:hover {
+      background-color: #575757;
+    }
+
+    #kerni-editor-language-dropdown button,
+    #kerni-editor-add-language-content .big-button {
+      border: none;
+      margin: 0;
+      padding: 15px 0;
+      width: 100%;
+      background-color: transparent;
+      color: #ffffff;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #kerni-editor #kerni-editor-publish-container {
+      position: relative;
+    }
+
+    #kerni-editor #kerni-editor-publish-message {
+      position: absolute;
+      right: 0;
+      bottom: 60px;
+      border-radius: 5px;
+      background-color: #252525;
+      color: #ffffff;
+      padding: 14px;
+      min-width: 216px;
+    }
+
+    #kerni-editor #kerni-editor-publish-message .close-button,
+    #kerni-editor #kerni-editor-add-language-container .close-button {
+      border: none;
+      background-color: transparent;
+      color: #424242;
+      padding: 0;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    #kerni-editor .kerni-message-content {
+      font-size: 13px;
+      font-weight: 400;
+      font-family: sans-serif;
+      text-align: center;
+      line-height: 19px;
+      margin-top: 5px;
+      margin-bottom: 14px;
+    }
+
+    #kerni-editor .kerni-message-icon {
+      font-size: 30px;
+      display: block;
+      text-align: center;
+    }
+
+    #kerni-editor .cursor-pointer {
+      cursor: pointer;
+    }
+
+    #kerni-editor .kerni-editor-add-language-selected {
+      background-color: #575757;
+    }
+  </style>
+
+  <div class="kerni-editor-flex-row">
+    <div class="kerni-editor-title">
+      <h1>Kerni</h1>
+    </div>
+    <div>
+      <button id="kerni-editor-preview" class="kerni-editor-button">Navigator</button>
+      <button id="kerni-editor-editor" class="kerni-editor-button kerni-editor-last">Editor</button>
+    </div>
+  </div>
+
+  <div class="kerni-editor-flex-row">
+    <div id="kerni-editor-change-language-container">
+      <button id="kerni-editor-change-language-button" class="kerni-editor-button kerni-editor-dropdown">Original Language</button>
+      <div id="kerni-editor-language-dropdown" style="display: none;">
+        <ul></ul>
+        <div>
+          <button id="kerni-editor-add-language-button" type="button">Add new language</button>  
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="kerni-editor-add-language-container" style="display: none;">
+    <div id="kerni-editor-add-language-content">
+      <div class="kerni-editor-flex-row kerni-editor-flex-sb">
+        <h1>Add new language</h1>
+        <button class="cursor-pointer close-button" type="button">&#x2715;</button>
+      </div>
+      <ul></ul>
+      <div>
+        <button id="kerni-editor-add-language-confirm-button" class="big-button" type="button">Add language</button>  
+      </div>
+    </div>
+  </div>
+
+  <div class="kerni-editor-flex-row">
+    <p id="kerni-editor-publish-changes">0 unpublished changes</p>
+    <div id="kerni-editor-publish-container">
+      <button id="kerni-editor-publish-button" class="kerni-editor-button kerni-editor-selected">Publish</button>
+      <div id="kerni-editor-publish-message" style="display: none;">
+        <div class="kerni-editor-flex-row kerni-editor-flex-end">
+          <button class="cursor-pointer close-button" type="button">&#x2715;</button>
+        </div>
+        <div>
+          <span class="kerni-message-icon">🎉</span>
+          <p class="kerni-message-content">You published 0<br>changes to your site!</p>
+        </div>
+      </div>
+    </div>
+    <button id="kerni-editor-close-button" class="kerni-editor-button kerni-editor-last">Close</button>
+  </div>
+</div>

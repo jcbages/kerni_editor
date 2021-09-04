@@ -1,0 +1,25 @@
+{
+  "name": "Kerni Editor",
+  "description": "A website editor for Kerni",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
+  "action": {
+    "default_icon": {
+      "16": "icon-16.png"
+    }
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icon-16.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["editor.html", "cursor.svg", "edit.svg"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

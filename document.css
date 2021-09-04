@@ -1,0 +1,21 @@
+.kerni-editor-mutated {
+  outline: 2px solid tomato !important;
+}
+
+.kerni-editor-hover {
+  cursor: default !important;
+  outline: 2px dotted green !important;
+}
+
+.kerni-editor-mutated.kerni-editor-hover {
+  outline: 2px dotted tomato !important;
+}
+
+.kerni-editor-click, .kerni-editor-click.kerni-editor-hover {
+  cursor: text !important;
+  outline: 2px solid green !important;
+}
+
+.kerni-editor-document-body {
+  margin-bottom: 66px !important;
+}
