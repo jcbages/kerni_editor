@@ -15,7 +15,7 @@ const MAX_EDITABLE_LEVEL_UP_LOOKUP = 2;
 const KERNI_EDITOR_USER_KEY = 'kerni-editor-user-key';
 
 const DRAFTS_KERNI_URL = 'drafts.kerni.app';
-const LANGUAGE_PATHNAME_REGEXP = '/^\/?([^\/]+)/';
+const LANGUAGE_PATHNAME_REGEXP = /^\/?([^\/]+)/;
 
 let kerniState = {
   kerniEditing: false,
