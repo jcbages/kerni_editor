@@ -14,7 +14,8 @@ const MAX_EDITABLE_LEVEL_UP_LOOKUP = 2;
 
 const KERNI_EDITOR_USER_KEY = 'kerni-editor-user-key';
 
-const LANGUAGE_URL_REGEXP = /^\/([^\/]+)(\/|$)/
+const DRAFTS_KERNI_URL = 'drafts.kerni.app';
+const LANGUAGE_PATHNAME_REGEXP = '/^\/?([^\/]+)/';
 
 let kerniState = {
   kerniEditing: false,
@@ -346,6 +347,13 @@ function apifyKerniState() {
 
 function getProjectId() {
   let projectId = window.location.host;
+
+  if (projectId === DRAFTS_KERNI_URL) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const kerniUrl = `${window.location.protocol}//${window.location.pathname.replace(/^\//, '')}`;
+    projectId = new URL(kerniUrl).hostname;
+  }
+
   if (projectId.startsWith('www.')) {
     projectId = projectId.substring('www.'.length);
   }
@@ -354,13 +362,12 @@ function getProjectId() {
 }
 
 function getLanguage() {
-  let language = window.location.pathname.match(LANGUAGE_URL_REGEXP);
+  const projectId = getProjectId();
+  const draftProjectIdRegex = new RegExp(`^\/(www.)?${projectId}`);
+  const pathName = window.location.host === DRAFTS_KERNI_URL ?  window.location.pathname.replace(draftProjectIdRegex, '') : window.location.pathname;
 
-  if (language && language[1] in VALID_LANGUAGES) {
-    return language[1]
-  } else {
-    return 'original';
-  }
+  const matches = pathName.match(LANGUAGE_PATHNAME_REGEXP)
+  return matches && matches[1] in VALID_LANGUAGES ? matches[1] : 'original';
 }
 
 function dismissEditingState() {
