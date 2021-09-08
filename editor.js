@@ -15,7 +15,7 @@ const MAX_EDITABLE_LEVEL_UP_LOOKUP = 2;
 const KERNI_EDITOR_USER_KEY = 'kerni-editor-user-key';
 
 const DRAFTS_KERNI_URL = 'drafts.kerni.app';
-const LANGUAGE_PATHNAME_REGEXP = /^\/?([^\/]+)/;
+const LANGUAGE_PATHNAME_REGEXP = /^\/([^\/]+)(.*)$/;
 
 let kerniState = {
   kerniEditing: false,
@@ -49,6 +49,8 @@ function shadow() {
 }
 
 function setupEditorBar() {
+  initSiteState();
+
   const previewButton = shadow().getElementById('kerni-editor-preview');
   const editorButton = shadow().getElementById('kerni-editor-editor');
   const publishMessage = shadow().getElementById('kerni-editor-publish-message');
@@ -82,9 +84,8 @@ function setupEditorBar() {
     editorButton.classList.add(KERNI_EDITOR_BUTTON_SELECTED_CLASS);
   });
 
-  const currentLanguage = getLanguage();
-  if (currentLanguage !== 'original') {
-    languageButton.innerHTML = `${VALID_LANGUAGES[currentLanguage].name} Language`;
+  if (kerniState.site.language !== 'original') {
+    languageButton.innerHTML = `${VALID_LANGUAGES[kerniState.site.language].name} Language`;
   }
 
   languageButton.addEventListener('click', _event => {
@@ -121,17 +122,26 @@ function setupEditorBar() {
   });
 
   languageDropdown.querySelector('ul').addEventListener('click', event => {
-    const currentLanguage = getLanguage();
     const targetLanguage = event.target.getAttribute('data-kerni_language');
 
-    let path = window.location.pathname;
-    if (currentLanguage !== 'original') {
-      path = path.replace(`/${currentLanguage}`, `/${targetLanguage}`);
+    let oldPrefix = '', targetPrefix = '';
+    if (kerniState.site.draft) {
+      targetPrefix = `/${kerniState.site.projectId}/${targetLanguage}`;
+      if (kerniState.site.language !== 'original') {
+        oldPrefix = `/${kerniState.site.projectId}/${kerniState.site.language}`;
+      } else {
+        oldPrefix = `/${kerniState.site.projectId}`
+      }
     } else {
-      path = `/${targetLanguage}${path}`;
+      targetPrefix = `/${targetLanguage}`;
+      if (kerniState.site.language !== 'original') {
+        oldPrefix = `/${kerniState.site.language}`;
+      } else {
+        oldPrefix = '/';
+      }
     }
-
-    window.location.href = `${window.location.origin}${path}`;
+    
+   window.location.href = window.location.href.replace(oldPrefix, targetPrefix);
   });
 
   addLanguageConfirmButton.addEventListener('click', async _event => {
@@ -154,8 +164,7 @@ function setupEditorBar() {
         return;
       }
 
-      const projectId = getProjectId();
-      const response = await fetch(`https://api.kerni.app/project/${projectId}/languages/${language}`, {
+      const response = await fetch(`https://api.kerni.app/project/${kerniState.site.projectId}/languages/${kerniState.site.language}`, {
         method: 'POST',
         headers: {'Authorization': `Basic ${authToken}`},
       })
@@ -205,9 +214,7 @@ function setupEditorBar() {
         return;
       }
 
-      const projectId = getProjectId();
-      const language = getLanguage();
-      const response = await fetch(`https://api.kerni.app/translation/${projectId}/${language}`, {
+      const response = await fetch(`https://api.kerni.app/translation/${kerniState.site.projectId}/${kerniState.site.language}?path_name=${kerniState.site.pathName}`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -227,6 +234,9 @@ function setupEditorBar() {
         kerniState.editorState.mutatedContent.clear();
 
         shadow().getElementById(KERNI_EDITOR_PUBLISH_CHANGES_ID).innerText = `${kerniState.editorState.mutatedElements.size} unpublished changes`;
+      } else if (response.status === 401) {
+        publishMessage.querySelector('.kerni-message-icon').innerHTML = '❌';
+        publishMessage.querySelector('.kerni-message-content').innerHTML = 'This project should only be editted inside the drafts.kerni.app URL';
       } else if (response.status === 403) {
         publishMessage.querySelector('.kerni-message-icon').innerHTML = '❌';
         publishMessage.querySelector('.kerni-message-content').innerHTML = 'Invalid user key,<br>Please check and update it in the extension options';
@@ -250,6 +260,37 @@ function setupEditorBar() {
   publishMessage.querySelector('button').addEventListener('click', _event => {
     publishMessage.style.display = 'none';
   });
+}
+
+function initSiteState() {
+  let url, draft;
+  if (window.location.host !== DRAFTS_KERNI_URL) {
+    url = window.location.href;
+    draft = false;
+  } else {
+    url = `${window.location.protocol}//${window.location.pathname.substring(1)}`;
+    draft = true;
+  }
+
+  const parsedUrl = new URL(url);
+  const projectId = parsedUrl.host;
+  const matches = parsedUrl.pathname.match(LANGUAGE_PATHNAME_REGEXP);
+
+  let language, pathName;
+  if (!matches) {
+    language = 'original';
+    pathName = '/';
+  } else {
+    language = matches[1] in VALID_LANGUAGES ? matches[1] : 'original';
+    pathName = matches[2].endsWith('/') ? matches[2] : `${matches[2]}/`;
+  }
+
+  kerniState.site = {
+    projectId: projectId,
+    language: language,
+    pathName: pathName,
+    draft: draft,
+  };
 }
 
 function dismissAddLanguageState() {
@@ -312,14 +353,12 @@ async function showLanguageDropdown() {
 }
 
 function isCurrentLanguage(language) {
-  const currentLanguage = getLanguage();
-  return currentLanguage === 'original' && language.original || currentLanguage === language.id;
+  return kerniState.site.language === 'original' && language.original || kerniState.site.language === language.id;
 }
 
 async function loadProjectLanguages() {
   try {
-    const projectId = getProjectId();
-    const response = await fetch(`https://api.kerni.app/project/${projectId}/languages`);
+    const response = await fetch(`https://api.kerni.app/project/${kerniState.site.projectId}/languages`);
 
     if (response.ok) {
       result = await response.json();
@@ -334,7 +373,10 @@ async function loadProjectLanguages() {
 }
 
 function apifyKerniState() {
-  let body = {changes: {}};
+  let body = {
+    draft: kerniState.site.draft,
+    changes: {},
+  };
 
   for (const [_key, value] of kerniState.editorState.mutatedContent) {
     if (!isEmptyText(value.originalValue)) {
@@ -343,31 +385,6 @@ function apifyKerniState() {
   }
 
   return body;
-}
-
-function getProjectId() {
-  let projectId = window.location.host;
-
-  if (projectId === DRAFTS_KERNI_URL) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const kerniUrl = `${window.location.protocol}//${window.location.pathname.replace(/^\//, '')}`;
-    projectId = new URL(kerniUrl).hostname;
-  }
-
-  if (projectId.startsWith('www.')) {
-    projectId = projectId.substring('www.'.length);
-  }
-
-  return projectId;
-}
-
-function getLanguage() {
-  const projectId = getProjectId();
-  const draftProjectIdRegex = new RegExp(`^\/(www.)?${projectId}`);
-  const pathName = window.location.host === DRAFTS_KERNI_URL ?  window.location.pathname.replace(draftProjectIdRegex, '') : window.location.pathname;
-
-  const matches = pathName.match(LANGUAGE_PATHNAME_REGEXP)
-  return matches && matches[1] in VALID_LANGUAGES ? matches[1] : 'original';
 }
 
 function dismissEditingState() {
