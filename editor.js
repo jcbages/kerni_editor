@@ -164,7 +164,7 @@ function setupEditorBar() {
         return;
       }
 
-      const response = await fetch(`https://api.kerni.app/project/${kerniState.site.projectId}/languages/${kerniState.site.language}`, {
+      const response = await fetch(`https://api.kerni.app/project/${kerniState.site.projectId}/languages/${language}`, {
         method: 'POST',
         headers: {'Authorization': `Basic ${authToken}`},
       })
