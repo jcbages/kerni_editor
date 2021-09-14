@@ -140,8 +140,8 @@ function setupEditorBar() {
         oldPrefix = '/';
       }
     }
-    
-   window.location.href = window.location.href.replace(oldPrefix, targetPrefix);
+
+    window.location.pathname = window.location.pathname.replace(oldPrefix, targetPrefix);
   });
 
   addLanguageConfirmButton.addEventListener('click', async _event => {
